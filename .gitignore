@@ -1,3 +1,14 @@
 .env
 .venv
-.gitignore
+models/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+filipinoemigrantsdb-bf734-firebase-adminsdk-fbsvc-67a3618e5a.json

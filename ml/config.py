@@ -2,8 +2,8 @@
 
 # LSTM Model Configuration
 LSTM_CONFIG = {
-    'units_layer_1': 64,
-    'units_layer_2': 32,
+    'units_layer1': 64,
+    'units_layer2': 32,
     'dropout_rate': 0.2,
     'epochs': 100,
     'batch_size': 8,

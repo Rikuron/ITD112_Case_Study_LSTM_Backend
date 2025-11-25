@@ -16,11 +16,11 @@ def main():
     print("Training all LSTM models for Filipino Emigrant Data prediction")
     print("=" * 60)
 
-    # Load e
+    # Load environment variables
     load_dotenv()
 
     # Initialize Firebase Admin
-    cred_path = os.getenv('FIREBASE_CRED_PATH')
+    cred_path = os.getenv('FIREBASE_CREDENTIALS_PATH')
     if not cred_path or not os.path.exists(cred_path):
         print("Warning: Firebase credentials not found. Using application default credentials.")
         firebase_admin.initialize_app()

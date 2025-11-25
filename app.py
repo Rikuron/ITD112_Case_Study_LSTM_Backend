@@ -16,22 +16,50 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# Initialize Firebase Admin
-cred_path = os.getenv('FIREBASE_CRED_PATH')
-if not cred_path or not os.path.exists(cred_path):
-    print("Wrning: Firebase credentials not found. Using application default credentials.")
+# Initialize Firebase Admin with flexible credential handling
+def initialize_firebase():
+    """Initialize Firebase with support for both local and hosting environments."""
+    
+    # Try Application Default Credentials first (for GCP hosting)
+    if os.getenv('GAE_ENV', '').startswith('standard') or os.getenv('FUNCTION_NAME'):
+        print("Using Application Default Credentials (GCP environment)")
+        firebase_admin.initialize_app()
+        return
+    
+    # Try JSON string from environment (for Vercel/Render/Heroku)
+    firebase_creds_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
+    if firebase_creds_json:
+        print("Using Firebase credentials from environment variable")
+        try:
+            cred_dict = json.loads(firebase_creds_json)
+            cred = credentials.Certificate(cred_dict)
+            firebase_admin.initialize_app(cred)
+            return
+        except json.JSONDecodeError as e:
+            print(f"Error parsing FIREBASE_CREDENTIALS_JSON: {e}")
+    
+    # Try file path (for local development)
+    firebase_creds_path = os.getenv('FIREBASE_CREDENTIALS_PATH')
+    if firebase_creds_path and os.path.exists(firebase_creds_path):
+        print(f"Using Firebase credentials from file: {firebase_creds_path}")
+        cred = credentials.Certificate(firebase_creds_path)
+        firebase_admin.initialize_app(cred)
+        return
+    
+    # Fallback
+    print("Warning: No Firebase credentials found. Using default credentials.")
     firebase_admin.initialize_app()
-else:
-    cred = credentials.Certificate(cred_path)
-    firebase_admin.initialize_app(cred)
+
+# Initialize Firebase
+initialize_firebase()
 
 # Health check endpoint
-@app.route('api/health', methods=['GET'])
+@app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'healthy', 'message': 'API is running'}), 200
 
 # Predict endpoint for specific category
-@app.route('api/predict/<category>', methods=['POST'])
+@app.route('/api/predict/<category>', methods=['POST'])
 def predict_category(category):
     try:
         # Validate category
@@ -57,14 +85,14 @@ def predict_category(category):
         return jsonify({'error': f"Prediction failed: {str(e)}"}), 500
 
 # Predict all categories
-@app.route('api/predict-all', methods=['POST'])
+@app.route('/api/predict-all', methods=['POST'])
 def predict_all():
     try:
         data = request.get_json() or {}
         years_ahead = data.get('years_ahead', 5)
 
         results = {}
-        error = {}
+        errors = {}
 
         for category in FIREBASE_COLLECTIONS.keys():
             try:
@@ -72,17 +100,19 @@ def predict_all():
                 predictions = predictor.predict_future(years_ahead)
                 results[category] = predictions
             except Exception as e:
-                error[category] = f"Prediction failed: {str(e)}"
+                errors[category] = f"Prediction failed: {str(e)}"
 
-        response = {'predictiopns': results}
+        response = {'predictions': results}
         if errors:
             response['errors'] = errors
+        
+        return jsonify(response), 200
 
     except Exception as e:
         return jsonify({'error': f"Prediction failed: {str(e)}"}), 500
 
 # Train model for specific category
-@app.route('api/train/<category>', methods=['POST'])
+@app.route('/api/train/<category>', methods=['POST'])
 def train_category(category):
     try:
         # Validate category
@@ -103,7 +133,7 @@ def train_category(category):
         return jsonify({'error': f"Training failed: {str(e)}"}), 500
 
 # Get model information
-@app.route('api/model-info/<category>', methods=['GET'])
+@app.route('/api/model-info/<category>', methods=['GET'])
 def get_model_info(category):
     try:
         # Validate category
@@ -126,7 +156,7 @@ def get_model_info(category):
         return jsonify({'error': f"Failed to get model information: {str(e)}"}), 500
 
 # Get all models information 
-@app.route('api/model-info-all', methods=['GET'])
+@app.route('/api/model-info-all', methods=['GET'])
 def get_all_models_info():
     try:
         if not os.path.exists(METADATA_FILE):

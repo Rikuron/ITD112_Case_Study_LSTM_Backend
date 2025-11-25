@@ -27,7 +27,7 @@ class ModelTrainer:
         print(f"Years range: {years[0]} - {years[-1]}")
 
         # Build model
-        input_shape = X_train.shape[1, X_train.shape[2]]
+        input_shape = (X_train.shape[1], X_train.shape[2])
         output_shape = y_train.shape[1]
 
         self.model = LSTMModel(input_shape, output_shape)

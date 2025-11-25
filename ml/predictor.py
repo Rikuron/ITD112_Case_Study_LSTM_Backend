@@ -60,7 +60,7 @@ class Predictor:
         predictions_denormalized = self.data_processor.inverse_transform(predictions_array)
 
         # Format results
-        results []
+        results = []
         for i, pred in enumerate(predictions_denormalized):
             year = last_year + i + 1
             prediction_dict = {

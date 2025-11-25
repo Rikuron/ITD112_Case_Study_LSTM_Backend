@@ -23,7 +23,7 @@ class LSTMModel:
         model = keras.Sequential([
             # First LSTM layer
             layers.LSTM(
-                LSTM_CONFIG['units_layer_1'],
+                LSTM_CONFIG['units_layer1'],
                 activation='tanh',
                 return_sequences=True,
                 input_shape=self.input_shape
@@ -32,7 +32,7 @@ class LSTMModel:
 
             # Second LSTM layer
             layers.LSTM(
-                LSTM_CONFIG['units_layer_2'],
+                LSTM_CONFIG['units_layer2'],
                 activation='tanh',
                 return_sequences=False,
             ),
