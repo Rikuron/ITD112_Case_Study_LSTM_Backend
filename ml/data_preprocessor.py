@@ -85,12 +85,15 @@ class DataProcessor:
         df = self.fetch_data_from_firebase()
         years, data_normalized = self.preprocess_data(df)
 
-        # For time series with limited data, use expanding window
-        if len(data_normalized) < 15:
-            # Use 70% of data as lookback
-            sequence_length = max(3, int(len(data_normalized) * 0.7))
+        # Dynamically determine sequence
+        total_years = len(data_normalized)
+
+        if total_years < 10:
+            sequence_length = max(3, int(total_years * 0.6))
+        elif total_years < 20:
+            sequence_length = int(total_years * 0.6)
         else:
-            sequence_length = len(data_normalized) - 1
+            sequence_length = min(15, int(total_years * 0.5))
 
         X, y = self.create_sequences(data_normalized, sequence_length)
 

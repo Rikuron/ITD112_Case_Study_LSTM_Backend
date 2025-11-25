@@ -54,22 +54,37 @@ class LSTMModel:
 
     def train(self, X_train, y_train, verbose=1):
         """Train the LSTM model."""
-        # Early stopping callback
-        early_stopping = keras.callbacks.EarlyStopping(
-            monitor='val_loss',
-            patience=LSTM_CONFIG['patience'],
-            restore_best_weights=True,
-            verbose=verbose
-        )
+        
+        # Determine if there are enough samples for validation
+        num_samples = X_train.shape[0]
+        use_validation = num_samples >= 10
+
+        callbacks = []
+
+        if use_validation:
+            # Early stopping callback
+            early_stopping = keras.callbacks.EarlyStopping(
+                monitor="val_loss",
+                patience=LSTM_CONFIG['patience'],
+                restore_best_weights=True,
+                verbose=verbose
+            )
+            callbacks.append(early_stopping)
+            validation_split = LSTM_CONFIG['validation_split']
+        else:
+            # No validation - use all data for training
+            validation_split = 0.0
+            if verbose:
+                print(f"Warning: Only {num_samples} samples available. Training without validation.")
 
         # Train
         history = self.model.fit(
             X_train, y_train,
-            epochs=LSTM_CONFIG['epochs'],
-            batch_size=LSTM_CONFIG['batch_size'],
-            validation_split=LSTM_CONFIG['validation_split'],
-            callbacks=[early_stopping],
-            verbose=verbose
+            epochs = LSTM_CONFIG['epochs'],
+            batch_size = min(LSTM_CONFIG['batch_size'], num_samples),
+            validation_split = validation_split,
+            callbacks = callbacks,
+            verbose = verbose
         )
 
         return history
