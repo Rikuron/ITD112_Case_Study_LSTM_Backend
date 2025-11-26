@@ -24,7 +24,18 @@ class Predictor:
         if not os.path.exists(scaler_path):
             raise FileNotFoundError(f"Scaler file not found for category: {self.category}. Please train the model first.")
 
-        self.model = keras.models.load_model(model_path)
+        # Load model without compiling (avoids metric deserialization issues)
+        from tensorflow import keras
+        self.model = keras.models.load_model(model_path, compile=False)
+        
+        # Recompile the model
+        from tensorflow.keras import optimizers
+        self.model.compile(
+            optimizer=optimizers.Adam(learning_rate=0.001),
+            loss='mse',
+            metrics=['mae']
+        )
+        
         self.data_processor.load_scaler(scaler_path)
 
     def predict_future(self, years_ahead=None):
