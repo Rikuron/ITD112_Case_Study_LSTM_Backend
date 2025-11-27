@@ -19,7 +19,9 @@ CORS(
     origins=[
         r"http://localhost:\d+",
         "https://itd-112-case-study.vercel.app",
-        r"https://.*\.vercel\.app"
+        r"https://.*\.vercel\.app",
+        r"https://.*\.hf\.space",
+        r"https://huggingface\.co"
     ],
     supports_credentials=True
 )
@@ -182,5 +184,8 @@ if __name__ == '__main__':
     # Ensure models directory exists
     os.makedirs(MODELS_DIR, exist_ok=True)
 
+    # Use PORT from environment (Hugging Face uses 7860, local uses 5432)
+    port = int(os.environ.get('PORT', 5432))
+
     # Run the Flask app
-    app.run(host='0.0.0.0', port=5432, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)

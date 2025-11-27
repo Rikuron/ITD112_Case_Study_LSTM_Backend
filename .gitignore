@@ -22,4 +22,7 @@ build/
 
 # IDE
 .idea/
-.vscode/
+.vscode
+
+.h5
+.pkl

@@ -1,3 +1,13 @@
+---
+title: Filipino Emigrants ML API
+emoji: 🇵🇭
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Filipino Emigrants ML Prediction API
 
 A Flask-based RESTful API powered by TensorFlow LSTM (Long Short-Term Memory) neural networks for predicting future Filipino emigration trends across multiple demographic categories.
