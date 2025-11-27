@@ -1,14 +1,25 @@
-.env
-.venv
-models/
+# Virtual environment
+.venv/
+venv
+env/
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
+
+# Environment files (secrets)
+.env
+*.json
+!models/metadata.json
 *.so
 *.egg
 *.egg-info/
 dist/
 build/
-filipinoemigrantsdb-bf734-firebase-adminsdk-fbsvc-67a3618e5a.json
+
+# IDE
+.idea/
+.vscode/

@@ -14,7 +14,11 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://itd-112-case-study.vercel.app"
+])
 
 # Initialize Firebase Admin with flexible credential handling
 def initialize_firebase():
