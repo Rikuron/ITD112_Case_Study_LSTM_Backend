@@ -12,11 +12,14 @@ pinned: false
 
 A Flask-based RESTful API powered by TensorFlow LSTM (Long Short-Term Memory) neural networks for predicting future Filipino emigration trends across multiple demographic categories.
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.20.0-FF6F00?logo=tensorflow&logoColor=white) ![Flask](https://img.shields.io/badge/Flask-3.1.2-000000?logo=flask&logoColor=white) ![Firebase](https://img.shields.io/badge/Firebase-12.3.0-FFCA28?logo=firebase&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white) ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.20.0-FF6F00?logo=tensorflow&logoColor=white) ![Flask](https://img.shields.io/badge/Flask-3.1.2-000000?logo=flask&logoColor=white) ![Firebase](https://img.shields.io/badge/Firebase-12.3.0-FFCA28?logo=firebase&logoColor=black) ![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Spaces-FFD21E?logo=huggingface&logoColor=black)
 
 ## 🌐 Live API
 
-**🔗 API Endpoint:** `http://localhost:5432` (local) or your deployed URL
+**🔗 Public Endpoint:** `https://sh00py-itd-112-filipino-emigrants-lstm.hf.space`
+
+> [!NOTE]
+> This is a public demo endpoint.
 
 ---
 
@@ -256,7 +259,7 @@ Dense Output Layer (num_features, linear activation)
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started (Local Development)
 
 ### Prerequisites
 
@@ -352,7 +355,7 @@ backend/
 ├── hyperparameter_tuning.py     # Hyperparameter optimization
 ├── quick_test.py                # Quick testing script
 ├── requirements.txt             # Python dependencies
-├── render.yaml                  # Render deployment config
+├── Dockerfile                   # Docker configuration for Hugging Face
 ├── .env                         # Environment variables (not in git)
 ├── .gitignore
 └── README.md
@@ -360,120 +363,28 @@ backend/
 
 ---
 
-## 🔧 Usage
+## 🌐 Deployment to Hugging Face Spaces
 
-### Training Models
+This API is configured for deployment on [Hugging Face Spaces](https://huggingface.co/spaces) using the Docker SDK.
 
-#### Train All Models
+### Steps to Deploy
 
-```bash
-python train_all_models.py
-```
+1.  **Create a New Space**:
+    -   Go to Hugging Face Spaces and create a new Space.
+    -   Select **Docker** as the SDK.
 
-This script will:
-- Train models for all 7 categories
-- Display progress and metrics
-- Save models to `models/` directory
-- Generate training summary
+2.  **Push Code**:
+    -   Push this `backend` directory to your Space's repository.
 
-#### Train Specific Category via API
+3.  **Configure Secrets**:
+    -   In your Space's **Settings**, go to the **Variables and secrets** section.
+    -   Add a new Secret:
+        -   **Name**: `FIREBASE_CREDENTIALS_JSON`
+        -   **Value**: Paste the content of your Firebase service account JSON file.
 
-```bash
-curl -X POST http://localhost:5432/api/train/age
-```
-
-### Making Predictions
-
-#### Predict Specific Category
-
-```bash
-curl -X POST http://localhost:5432/api/predict/age \
-  -H "Content-Type: application/json" \
-  -d '{"years_ahead": 5}'
-```
-
-#### Predict All Categories
-
-```bash
-curl -X POST http://localhost:5432/api/predict-all \
-  -H "Content-Type: application/json" \
-  -d '{"years_ahead": 10}'
-```
-
-### Hyperparameter Tuning
-
-```bash
-python hyperparameter_tuning.py
-```
-
-This script performs grid search to find optimal hyperparameters:
-- LSTM layer sizes
-- Dropout rates
-- Learning rates
-- Batch sizes
-
----
-
-## 🌐 Deployment
-
-### Deploy to Render
-
-1. **Create a new Web Service** on [Render](https://render.com)
-
-2. **Connect your repository**
-
-3. **Configure the service**:
-   - **Environment**: Python 3
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app --bind 0.0.0.0:$PORT`
-   - **Region**: Choose closest to your users
-
-4. **Add environment variables**:
-   - `FIREBASE_CREDENTIALS_JSON`: Your Firebase service account JSON (as string)
-   - `PYTHON_VERSION`: `3.12.0`
-
-5. **Deploy** and note your API URL
-
-6. **Update frontend** to use the deployed URL in `predictionService.ts`
-
-### Deploy to Railway
-
-```bash
-# Install Railway CLI
-npm i -g @railway/cli
-
-# Login
-railway login
-
-# Initialize project
-railway init
-
-# Add environment variables
-railway variables set FIREBASE_CREDENTIALS_JSON='{"type":"service_account",...}'
-
-# Deploy
-railway up
-```
-
-### Deploy to Heroku
-
-```bash
-# Install Heroku CLI
-# Login
-heroku login
-
-# Create app
-heroku create your-app-name
-
-# Add buildpack
-heroku buildpacks:set heroku/python
-
-# Set environment variables
-heroku config:set FIREBASE_CREDENTIALS_JSON='{"type":"service_account",...}'
-
-# Deploy
-git push heroku main
-```
+4.  **Build and Run**:
+    -   Hugging Face will automatically build the Docker image and start the application.
+    -   The `Dockerfile` is configured to expose port `7860` and run the Flask app with Gunicorn.
 
 ---
 
@@ -504,155 +415,12 @@ CORS(
     app, 
     origins=[
         "https://your-frontend-domain.com",
-        "https://your-frontend.vercel.app"
+        "https://your-frontend.vercel.app",
+        r"https://.*\.hf\.space"
     ],
     supports_credentials=True
 )
 ```
-
----
-
-## 🧪 Testing
-
-### Quick Test
-
-```bash
-python quick_test.py
-```
-
-### Test API Endpoints
-
-```bash
-# Health check
-curl http://localhost:5432/api/health
-
-# Get model info
-curl http://localhost:5432/api/model-info/age
-
-# Make prediction
-curl -X POST http://localhost:5432/api/predict/age \
-  -H "Content-Type: application/json" \
-  -d '{"years_ahead": 3}'
-```
-
----
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-#### Firebase Connection Error
-
-**Problem:** "Firebase credentials not found"
-
-**Solution:**
-- Verify `.env` file exists in backend directory
-- Check `FIREBASE_CREDENTIALS_PATH` or `FIREBASE_CREDENTIALS_JSON` is set
-- Ensure Firebase credentials file exists at specified path
-- For JSON string, ensure proper escaping
-
-#### Model Not Found Error
-
-**Problem:** "Model file not found for category: age"
-
-**Solution:**
-- Run `python train_all_models.py` to train models
-- Check `models/` directory contains `.h5` and `.pkl` files
-- Verify Firebase has historical data for the category
-
-#### TensorFlow/CUDA Errors
-
-**Problem:** GPU-related errors or warnings
-
-**Solution:**
-- TensorFlow will automatically use CPU if GPU unavailable
-- For GPU support, install `tensorflow-gpu` and CUDA toolkit
-- Warnings about GPU can be safely ignored for CPU-only deployment
-
-#### Port Already in Use
-
-**Problem:** "Address already in use: 5432"
-
-**Solution:**
-```bash
-# Find process using port 5432
-# Windows:
-netstat -ano | findstr :5432
-
-# macOS/Linux:
-lsof -i :5432
-
-# Kill the process or change port in app.py
-```
-
-#### Insufficient Data Error
-
-**Problem:** "Not enough data to create sequences"
-
-**Solution:**
-- Ensure Firebase has at least 5 years of historical data
-- Reduce `min_sequence_length` in `config.py`
-- Check Firebase collection paths are correct
-
----
-
-## 📊 Model Performance
-
-### Typical Metrics
-
-| Category | MAE | MSE | Training Time |
-|----------|-----|-----|---------------|
-| Age | 0.11 | 0.02 | ~2 min |
-| Sex | 0.08 | 0.01 | ~1 min |
-| Civil Status | 0.13 | 0.03 | ~2 min |
-| Education | 0.10 | 0.02 | ~2 min |
-| Occupation | 0.15 | 0.04 | ~3 min |
-| Origin | 0.12 | 0.02 | ~2 min |
-| Destination | 0.14 | 0.03 | ~3 min |
-
-*Note: Metrics vary based on data quality and quantity*
-
----
-
-## 🔄 Model Retraining
-
-Models should be retrained when:
-
-1. **New data available**: After adding new year's data to Firebase
-2. **Performance degradation**: If predictions become less accurate
-3. **Hyperparameter changes**: After tuning configuration
-4. **Data distribution shift**: Significant changes in emigration patterns
-
-### Automated Retraining (Recommended)
-
-Set up a cron job or scheduled task:
-
-```bash
-# Linux/macOS crontab
-0 0 1 * * cd /path/to/backend && /path/to/.venv/bin/python train_all_models.py
-
-# Windows Task Scheduler
-# Create task to run train_all_models.py monthly
-```
-
----
-
-## 🤝 Contributing
-
-1. **Fork** the repository
-2. **Create** your feature branch
-   ```bash
-   git checkout -b feature/ImprovedLSTM
-   ```
-3. **Commit** your changes
-   ```bash
-   git commit -m 'Add improved LSTM architecture'
-   ```
-4. **Push** to the branch
-   ```bash
-   git push origin feature/ImprovedLSTM
-   ```
-5. **Open** a Pull Request
 
 ---
 
