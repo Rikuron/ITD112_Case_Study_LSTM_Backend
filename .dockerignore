@@ -1,0 +1,11 @@
+.venv
+__pycache__
+*.pyc
+.env
+.git
+.gitignore
+.python-version
+quick_test.py
+hyperparameter_tuning.py
+render.yaml
+filipinoemigrantsdb-bf734-firebase-adminsdk-fbsvc-67a3618e5a.json
