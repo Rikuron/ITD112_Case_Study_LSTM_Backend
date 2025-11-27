@@ -1,6 +1,6 @@
 ---
 title: Filipino Emigrants ML API
-emoji: 🇵🇭
+emoji: 🚀
 colorFrom: blue
 colorTo: purple
 sdk: docker
