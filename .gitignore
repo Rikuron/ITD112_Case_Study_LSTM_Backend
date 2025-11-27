@@ -18,6 +18,26 @@ __pycache__/
 *.egg
 *.egg-info/
 dist/
+# Virtual environment
+.venv/
+venv
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment files (secrets)
+.env
+*.json
+!models/metadata.json
+*.so
+*.egg
+*.egg-info/
+dist/
 build/
 
 # IDE
@@ -25,5 +45,3 @@ build/
 .vscode
 
 # Model Files (upload directly via Hugging Face Web Interface)
-*.h5
-*.pkl
